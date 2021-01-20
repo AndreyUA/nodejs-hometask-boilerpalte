@@ -1,17 +1,18 @@
-const express = require('express')
-const cors = require('cors');
-require('./config/db');
+const express = require("express");
+const cors = require("cors");
+require("./config/db");
 
-const app = express()
+const app = express();
 
 app.use(cors());
-app.use(express.json());
+// НУЖНО ПОСМОТРЕТЬ КАК В ВИДЕО СДЕЛАНО!!!
+app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
 
-const routes = require('./routes/index');
+const routes = require("./routes/index");
 routes(app);
 
-app.use('/', express.static('./client/build'));
+app.use("/", express.static("./client/build"));
 
 const port = 3050;
 app.listen(port, () => {});
