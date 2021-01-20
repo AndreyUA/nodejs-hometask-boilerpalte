@@ -12,7 +12,15 @@ const router = Router();
 router.post("/", createUserValid, async (req, res) => {
   const { firstName, lastName, email, phoneNumber, password } = req.body;
 
-  const user = UserService.createUser({
+  let user = UserService.search({ email });
+
+  if (user) {
+    return res
+      .status(400)
+      .json({ error: true, message: "User already exists" });
+  }
+
+  user = UserService.createUser({
     firstName,
     lastName,
     email,
@@ -20,12 +28,18 @@ router.post("/", createUserValid, async (req, res) => {
     password,
   });
 
-  res.status(200).json(user);
+  res.status(200).json({ firstName, lastName, email, phoneNumber });
 });
 
 // delete user
 router.delete("/:id", async (req, res) => {
-  const delUserId = UserService.deleteUser(req.params.id);
+  const user = UserService.search({ id: req.params.id });
+
+  if (!user) {
+    return res.status(404).json({ error: true, message: "User not found!" });
+  }
+
+  UserService.deleteUser(req.params.id);
 
   res.status(200).json(`User with ID ${req.params.id} removed!`);
 });
