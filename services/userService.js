@@ -6,6 +6,11 @@ class UserService {
     return create;
   }
 
+  getAllUsers() {
+    const allUsers = UserRepository.getAll();
+    return allUsers;
+  }
+
   deleteUser(id) {
     const del = UserRepository.delete(id);
     return del;

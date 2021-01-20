@@ -8,11 +8,32 @@ const { responseMiddleware } = require("../middlewares/response.middleware");
 
 const router = Router();
 
-// create new user
+// @route       GET /api/users
+// @desc        Get all users
+router.get("/", async (req, res) => {
+  const allUsers = await UserService.getAllUsers();
+
+  res.status(200).json(allUsers);
+});
+
+// @route       GET /api/users/:id
+// @desc        Get user by ID
+router.get("/:id", async (req, res) => {
+  const user = await UserService.search({ id: req.params.id });
+
+  if (!user) {
+    return res.status(404).json({ error: true, message: "User not found!" });
+  }
+
+  res.status(200).json(user);
+});
+
+// @route       POST /api/users
+// @desc        Create new user
 router.post("/", createUserValid, async (req, res) => {
   const { firstName, lastName, email, phoneNumber, password } = req.body;
 
-  let user = UserService.search({ email });
+  let user = await UserService.search({ email });
 
   if (user) {
     return res
@@ -20,7 +41,7 @@ router.post("/", createUserValid, async (req, res) => {
       .json({ error: true, message: "User already exists" });
   }
 
-  user = UserService.createUser({
+  user = await UserService.createUser({
     firstName,
     lastName,
     email,
@@ -31,9 +52,14 @@ router.post("/", createUserValid, async (req, res) => {
   res.status(200).json({ firstName, lastName, email, phoneNumber });
 });
 
-// delete user
+// @route       PUT /api/users/:id
+// @desc        Change users information
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// @route       DELETE /api/users/:id
+// @desc        Delete user
 router.delete("/:id", async (req, res) => {
-  const user = UserService.search({ id: req.params.id });
+  const user = await UserService.search({ id: req.params.id });
 
   if (!user) {
     return res.status(404).json({ error: true, message: "User not found!" });
