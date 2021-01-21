@@ -13,6 +13,10 @@ const router = Router();
 router.get("/", async (req, res) => {
   const allUsers = await UserService.getAllUsers();
 
+  if (allUsers.length === 0) {
+    return res.status(400).json({ error: true, message: "No active users" });
+  }
+
   res.status(200).json(allUsers);
 });
 
@@ -53,8 +57,26 @@ router.post("/", createUserValid, async (req, res) => {
 });
 
 // @route       PUT /api/users/:id
-// @desc        Change users information
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// @desc        Change users credentials
+router.put("/:id", async (req, res) => {
+  const { firstName, lastName, email, phoneNumber, password } = req.body;
+
+  let user = await UserService.search({ id: req.params.id });
+
+  if (!user) {
+    return res.status(404).json({ error: true, message: "User not found!" });
+  }
+
+  user = await UserService.updateUser(req.params.id, {
+    firstName,
+    lastName,
+    email,
+    phoneNumber,
+    password,
+  });
+
+  res.status(200).json(user);
+});
 
 // @route       DELETE /api/users/:id
 // @desc        Delete user

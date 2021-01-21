@@ -5,7 +5,6 @@ require("./config/db");
 const app = express();
 
 app.use(cors());
-// НУЖНО ПОСМОТРЕТЬ КАК В ВИДЕО СДЕЛАНО!!!
 app.use(express.json({ extended: false }));
 app.use(express.urlencoded({ extended: true }));
 
