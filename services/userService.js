@@ -1,16 +1,33 @@
-const { UserRepository } = require('../repositories/userRepository');
+const { UserRepository } = require("../repositories/userRepository");
 
 class UserService {
+  createUser(data) {
+    const create = UserRepository.create(data);
+    return create;
+  }
 
-    // TODO: Implement methods to work with user
+  getAllUsers() {
+    const allUsers = UserRepository.getAll();
+    return allUsers;
+  }
 
-    search(search) {
-        const item = UserRepository.getOne(search);
-        if(!item) {
-            return null;
-        }
-        return item;
+  deleteUser(id) {
+    const del = UserRepository.delete(id);
+    return del;
+  }
+
+  updateUser(id, data) {
+    const user = UserRepository.update(id, data);
+    return user;
+  }
+
+  search(search) {
+    const item = UserRepository.getOne(search);
+    if (!item) {
+      return null;
     }
+    return item;
+  }
 }
 
 module.exports = new UserService();
