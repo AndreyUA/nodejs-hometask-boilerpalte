@@ -5,11 +5,11 @@ const createUserValid = (req, res, next) => {
   try {
     const { firstName, lastName, email, phoneNumber, password } = req.body;
 
-    if (firstName.length === 0 || lastName.length === 0) {
+    if (firstName === "" || lastName === "") {
       throw Error("Please enter valid name or lastname");
     }
 
-    if (password.length < 3) {
+    if (password.length < 3 || password === "") {
       throw Error("Please enter valid password with 3 or more characters");
     }
 
@@ -45,7 +45,7 @@ const updateUserValid = (req, res, next) => {
   try {
     const { firstName, lastName, email, phoneNumber, password } = req.body;
 
-    if (firstName.length === 0 || lastName.length === 0) {
+    if (firstName === "" || lastName === "") {
       throw Error("Please enter valid name or lastname");
     }
 
