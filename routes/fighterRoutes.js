@@ -8,89 +8,108 @@ const {
 
 const router = Router();
 
-exports.fighter = {
-  id: "",
-  name: "",
-  health: 100,
-  power: 0,
-  defense: 1, // 1 to 10
-};
+router.get(
+  "/",
+  (req, res, next) => {
+    try {
+      const data = FighterService.getAllFighters();
 
-// @route       GET /api/fighters
-// @desc        Get all fighters
-router.get("/", async (req, res) => {
-  const allFighters = FighterService.getAllFighters();
+      res.data = data;
+    } catch (err) {
+      res.err = err;
+    } finally {
+      next();
+    }
+  },
+  responseMiddleware
+);
 
-  res.status(200).json(allFighters);
-});
+router.get(
+  "/:id",
+  (req, res, next) => {
+    try {
+      const fighter = FighterService.search({ id: req.params.id });
 
-// @route       GET /api/fighters/:id
-// @desc        Get fighter by ID
-router.get("/:id", async (req, res) => {
-  const fighter = await FighterService.search({ id: req.params.id });
+      if (!fighter) {
+        throw Error("Fighter not found");
+      }
 
-  if (!fighter) {
-    return res.status(404).json({ error: true, message: "Fighter not found!" });
-  }
+      res.data = fighter;
+    } catch (err) {
+      res.err = err;
+    } finally {
+      next();
+    }
+  },
+  responseMiddleware
+);
 
-  res.status(200).json(fighter);
-});
+router.post(
+  "/",
+  createFighterValid,
+  (req, res, next) => {
+    if (res.err) {
+      return res.status(400).json({ error: true, message: res.err.message });
+    }
+    const { name, health, power, defense } = req.body;
 
-// @route       POST /api/fighters
-// @desc        Create new fighter
-router.post("/", createFighterValid, async (req, res) => {
-  const { name, health, power, defense } = req.body;
-  let fighter;
-  /*
+    const fighter = FighterService.createFighter({
+      name,
+      health,
+      power,
+      defense,
+    });
 
-  let user = await UserService.search({ email });
+    res.data = fighter;
 
-  if (user) {
-    return res
-      .status(400)
-      .json({ error: true, message: "User already exists" });
-  }
-  */
+    next();
+  },
+  responseMiddleware
+);
 
-  fighter = await FighterService.createFighter({
-    name,
-    health,
-    power,
-    defense,
-  });
+router.put(
+  "/:id",
+  updateFighterValid,
+  (req, res, next) => {
+    if (res.err) {
+      return res.status(400).json({ error: true, message: res.err.message });
+    }
 
-  res.status(200).json(fighter);
-});
+    const { health, power, defense } = req.body;
 
-// @route       PUT /api/fighters/:id
-// @desc        Change fighters credentials
-router.put("/:id", async (req, res) => {
-  const { name, health, power, defense } = req.body;
+    const figher = FighterService.updateFighter(req.params.id, {
+      health,
+      power,
+      defense,
+    });
 
-  let figher;
-  /*
-  let user = await UserService.search({ id: req.params.id });
+    res.data = figher;
 
-  if (!user) {
-    return res.status(404).json({ error: true, message: "User not found!" });
-  }
-  */
+    next();
+  },
+  responseMiddleware
+);
 
-  figher = await FighterService.updateFighter(req.params.id, {
-    name,
-    health,
-    power,
-    defense,
-  });
+router.delete(
+  "/:id",
+  (req, res, next) => {
+    try {
+      const fighter = FighterService.search({ id: req.params.id });
 
-  res.status(200).json(figher);
-});
+      if (!fighter) {
+        throw Error("Fighter not found");
+      }
 
-// @route       DELETE /api/fighters/:id
-// @desc        Delete fighter
-router.delete("/:id", async (req, res) => {
-  FighterService.deleteFighter(req.params.id);
-  res.status(200).json(`Fighter with ID ${req.params.id} removed!`);
-});
+      FighterService.deleteFighter(req.params.id);
+
+      res.data = { message: `Fighter ${fighter.name} removed!` };
+    } catch (err) {
+      res.err = err;
+    } finally {
+      next();
+    }
+  },
+  responseMiddleware
+);
 
 module.exports = router;
