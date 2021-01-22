@@ -1,14 +1,17 @@
 const { UserRepository } = require("../repositories/userRepository");
 
 class UserService {
+  getAllUsers() {
+    const allUsers = UserRepository.getAll();
+    if (allUsers.length === 0) {
+      throw Error("No active users");
+    }
+    return allUsers;
+  }
+
   createUser(data) {
     const create = UserRepository.create(data);
     return create;
-  }
-
-  getAllUsers() {
-    const allUsers = UserRepository.getAll();
-    return allUsers;
   }
 
   deleteUser(id) {
