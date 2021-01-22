@@ -8,88 +8,111 @@ const { responseMiddleware } = require("../middlewares/response.middleware");
 
 const router = Router();
 
-// @route       GET /api/users
-// @desc        Get all users
-router.get("/", async (req, res) => {
-  const allUsers = await UserService.getAllUsers();
+router.get(
+  "/",
+  (req, res, next) => {
+    try {
+      const data = UserService.getAllUsers();
 
-  if (allUsers.length === 0) {
-    return res.status(400).json({ error: true, message: "No active users" });
-  }
+      res.data = data;
+    } catch (err) {
+      res.err = err;
+    } finally {
+      next();
+    }
+  },
+  responseMiddleware
+);
 
-  res.status(200).json(allUsers);
-});
+router.get(
+  "/:id",
+  (req, res, next) => {
+    try {
+      const data = UserService.search({ id: req.params.id });
 
-// @route       GET /api/users/:id
-// @desc        Get user by ID
-router.get("/:id", async (req, res) => {
-  const user = await UserService.search({ id: req.params.id });
+      if (!data) {
+        throw Error("User not found");
+      }
 
-  if (!user) {
-    return res.status(404).json({ error: true, message: "User not found!" });
-  }
+      res.data = data;
+    } catch (err) {
+      res.err = err;
+    } finally {
+      next();
+    }
+  },
+  responseMiddleware
+);
 
-  res.status(200).json(user);
-});
+router.post(
+  "/",
+  createUserValid,
+  (req, res, next) => {
+    if (res.err) {
+      return res.status(400).json({ error: true, message: res.err.message });
+    }
 
-// @route       POST /api/users
-// @desc        Create new user
-router.post("/", createUserValid, async (req, res) => {
-  const { firstName, lastName, email, phoneNumber, password } = req.body;
+    const { firstName, lastName, email, phoneNumber, password } = req.body;
 
-  let user = await UserService.search({ email });
+    const data = UserService.createUser({
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+      password,
+    });
 
-  if (user) {
-    return res
-      .status(400)
-      .json({ error: true, message: "User already exists" });
-  }
+    res.data = data;
 
-  user = await UserService.createUser({
-    firstName,
-    lastName,
-    email,
-    phoneNumber,
-    password,
-  });
+    next();
+  },
+  responseMiddleware
+);
 
-  res.status(200).json({ firstName, lastName, email, phoneNumber });
-});
+router.put(
+  "/:id",
+  updateUserValid,
+  (req, res, next) => {
+    if (res.err) {
+      return res.status(400).json({ error: true, message: res.err.message });
+    }
 
-// @route       PUT /api/users/:id
-// @desc        Change users credentials
-router.put("/:id", async (req, res) => {
-  const { firstName, lastName, email, phoneNumber, password } = req.body;
+    const { firstName, lastName, phoneNumber, password } = req.body;
 
-  let user = await UserService.search({ id: req.params.id });
+    const updateUser = UserService.updateUser(req.params.id, {
+      firstName,
+      lastName,
+      phoneNumber,
+      password,
+    });
 
-  if (!user) {
-    return res.status(404).json({ error: true, message: "User not found!" });
-  }
+    res.data = updateUser;
 
-  user = await UserService.updateUser(req.params.id, {
-    firstName,
-    lastName,
-    email,
-    phoneNumber,
-    password,
-  });
+    next();
+  },
+  responseMiddleware
+);
 
-  res.status(200).json(user);
-});
+router.delete(
+  "/:id",
+  (req, res, next) => {
+    try {
+      const user = UserService.search({ id: req.params.id });
 
-// @route       DELETE /api/users/:id
-// @desc        Delete user
-router.delete("/:id", async (req, res) => {
-  const user = await UserService.search({ id: req.params.id });
+      if (!user) {
+        throw Error("User not found");
+      }
 
-  if (!user) {
-    return res.status(404).json({ error: true, message: "User not found!" });
-  }
+      UserService.deleteUser(req.params.id);
 
-  UserService.deleteUser(req.params.id);
-
-  res.status(200).json(`User with ID ${req.params.id} removed!`);
-});
+      res.data = { message: `User ${user.email} removed!` };
+    } catch (err) {
+      res.err = err;
+    } finally {
+      next();
+    }
+  },
+  responseMiddleware
+);
 
 module.exports = router;
