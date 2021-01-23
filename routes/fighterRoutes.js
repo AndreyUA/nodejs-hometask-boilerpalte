@@ -51,11 +51,11 @@ router.post(
     if (res.err) {
       return res.status(400).json({ error: true, message: res.err.message });
     }
-    const { name, health, power, defense } = req.body;
+    const { name, power, defense } = req.body;
 
     const fighter = FighterService.createFighter({
       name,
-      health,
+      health: 100,
       power,
       defense,
     });

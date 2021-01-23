@@ -1,24 +1,12 @@
 const { fighter } = require("../models/fighter");
 const FighterService = require("../services/fighterService");
 
-exports.fighter = {
-  id: "",
-  name: "",
-  health: 100,
-  power: 0,
-  defense: 1, // 1 to 10
-};
-
 const createFighterValid = (req, res, next) => {
   try {
-    const { name, health, power, defense } = req.body;
+    const { name, power, defense } = req.body;
 
     if (name === "") {
       throw Error("Please enter a valid fighter name");
-    }
-
-    if (!Number.isInteger(+health) || +health < 0) {
-      throw Error("Please enter a correct health value");
     }
 
     if (!Number.isInteger(+power) || +power < 1 || +power > 10) {
@@ -42,13 +30,8 @@ const createFighterValid = (req, res, next) => {
 };
 
 const updateFighterValid = (req, res, next) => {
-  // TODO: Implement validatior for fighter entity during update
   try {
-    const { name, health, power, defense } = req.body;
-
-    if (!Number.isInteger(+health) || +health < 0) {
-      throw Error("Please enter a correct health value");
-    }
+    const { name, power, defense } = req.body;
 
     if (!Number.isInteger(+power) || +power < 1 || +power > 10) {
       throw Error("Please enter a power value from 1 to 10");
