@@ -54,6 +54,22 @@ router.post(
 
     const { firstName, lastName, email, phoneNumber, password } = req.body;
 
+    const existUserByEmail = UserService.search({ email });
+
+    if (existUserByEmail) {
+      return res
+        .status(400)
+        .json({ error: true, message: "This email already used" });
+    }
+
+    const existUserByPhone = UserService.search({ phoneNumber });
+
+    if (existUserByPhone) {
+      return res
+        .status(400)
+        .json({ error: true, message: "This phone number already used" });
+    }
+
     const data = UserService.createUser({
       firstName,
       lastName,
@@ -78,6 +94,12 @@ router.put(
     }
 
     const { firstName, lastName, phoneNumber, password } = req.body;
+
+    const existUser = UserService.search({ id: req.params.id });
+
+    if (!existUser) {
+      throw Error("User not found");
+    }
 
     const updateUser = UserService.updateUser(req.params.id, {
       firstName,
