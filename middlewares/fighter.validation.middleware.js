@@ -16,12 +16,6 @@ const createFighterValid = (req, res, next) => {
     if (!Number.isInteger(+defense) || +defense < 1 || +defense > 10) {
       throw Error("Please enter a defense value from 1 to 10");
     }
-
-    const existFighter = FighterService.search({ name });
-
-    if (existFighter) {
-      throw Error("Fighter already exists");
-    }
   } catch (err) {
     res.err = err;
   } finally {
@@ -45,10 +39,6 @@ const updateFighterValid = (req, res, next) => {
 
     if (!existFighter) {
       throw Error("Fighter not found");
-    }
-
-    if (existFighter.name !== name) {
-      throw Error("You can't change fighter's name");
     }
   } catch (err) {
     res.err = err;

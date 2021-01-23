@@ -5,6 +5,10 @@ const createUserValid = (req, res, next) => {
   try {
     const { firstName, lastName, email, phoneNumber, password } = req.body;
 
+    if (req.body.id) {
+      throw Error("You can't declare id");
+    }
+
     if (firstName === "" || lastName === "") {
       throw Error("Please enter valid name or lastname");
     }
@@ -27,12 +31,6 @@ const createUserValid = (req, res, next) => {
       !phoneReg
     ) {
       throw Error("Please enter a correct phone number (+380xxxxxxxxx)");
-    }
-
-    const existUser = UserService.search({ email });
-
-    if (existUser) {
-      throw Error("User already exists");
     }
   } catch (err) {
     res.err = err;
@@ -61,16 +59,6 @@ const updateUserValid = (req, res, next) => {
       !phoneReg
     ) {
       throw Error("Please enter a correct phone number (+380xxxxxxxxx)");
-    }
-
-    const existUser = UserService.search({ id: req.params.id });
-
-    if (!existUser) {
-      throw Error("User not found");
-    }
-
-    if (existUser.email !== email) {
-      throw Error("You can't change your email");
     }
   } catch (err) {
     res.err = err;

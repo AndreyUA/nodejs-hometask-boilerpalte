@@ -9,7 +9,7 @@ class FighterService {
   getAllFighters() {
     const allFighters = FighterRepository.getAll();
     if (allFighters.length === 0) {
-      throw Error("No active fighters");
+      return null;
     }
     return allFighters;
   }
