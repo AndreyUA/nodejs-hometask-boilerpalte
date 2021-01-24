@@ -5,7 +5,11 @@ const createFighterValid = (req, res, next) => {
   try {
     const { name, power, defense } = req.body;
 
-    if (name === "") {
+    if (req.body.id) {
+      throw Error("You can't declare id");
+    }
+
+    if (name === "" || !name) {
       throw Error("Please enter a valid fighter name");
     }
 
@@ -25,7 +29,7 @@ const createFighterValid = (req, res, next) => {
 
 const updateFighterValid = (req, res, next) => {
   try {
-    const { name, power, defense } = req.body;
+    const { power, defense } = req.body;
 
     if (!Number.isInteger(+power) || +power < 1 || +power > 10) {
       throw Error("Please enter a power value from 1 to 10");
@@ -37,7 +41,7 @@ const updateFighterValid = (req, res, next) => {
 
     const existFighter = FighterService.search({ id: req.params.id });
 
-    if (!existFighter) {
+    if (Object.keys(existFighter).length === 0) {
       throw Error("Fighter not found");
     }
   } catch (err) {
