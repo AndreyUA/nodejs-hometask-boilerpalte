@@ -9,7 +9,7 @@ const createUserValid = (req, res, next) => {
       throw Error("You can't declare id");
     }
 
-    if (firstName === "" || lastName === "") {
+    if (firstName === "" || lastName === "" || !firstName || !lastName) {
       throw Error("Please enter valid name or lastname");
     }
 
@@ -43,6 +43,10 @@ const updateUserValid = (req, res, next) => {
   try {
     const { firstName, lastName, email, phoneNumber, password } = req.body;
 
+    if (req.body.id) {
+      throw Error("You can't declare id");
+    }
+
     if (firstName === "" || lastName === "") {
       throw Error("Please enter valid name or lastname");
     }
@@ -59,6 +63,18 @@ const updateUserValid = (req, res, next) => {
       !phoneReg
     ) {
       throw Error("Please enter a correct phone number (+380xxxxxxxxx)");
+    }
+
+    const gmailReg = /[a-zA-Z0-9]+\@gmail.com/.test(email);
+
+    if (!gmailReg) {
+      throw Error("Please include a valid gmail post");
+    }
+
+    const existUser = UserService.search({ id: req.params.id });
+
+    if (!existUser) {
+      throw Error("User not found");
     }
   } catch (err) {
     res.err = err;

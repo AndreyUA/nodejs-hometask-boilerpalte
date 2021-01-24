@@ -28,7 +28,8 @@ router.get(
   "/:id",
   (req, res, next) => {
     try {
-      const fighter = FighterService.search({ id: req.params.id });
+      const { id } = req.params;
+      const fighter = FighterService.search({ id });
 
       res.data = fighter;
     } catch (err) {
@@ -90,9 +91,17 @@ router.delete(
   "/:id",
   (req, res, next) => {
     try {
-      FighterService.deleteFighter(req.params.id);
+      const { id } = req.params;
 
-      res.data = { message: `Fighter removed!` };
+      const existFighter = FighterService.search({ id });
+
+      if (Object.keys(existFighter).length === 0) {
+        throw Error("Fighter not found");
+      }
+
+      const delFighter = FighterService.deleteFighter(id);
+
+      res.data = delFighter;
     } catch (err) {
       res.err = err;
     } finally {

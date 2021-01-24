@@ -93,17 +93,12 @@ router.put(
       return res.status(400).json({ error: true, message: res.err.message });
     }
 
-    const { firstName, lastName, phoneNumber, password } = req.body;
-
-    const existUser = UserService.search({ id: req.params.id });
-
-    if (!existUser) {
-      throw Error("User not found");
-    }
+    const { firstName, lastName, email, phoneNumber, password } = req.body;
 
     const updateUser = UserService.updateUser(req.params.id, {
       firstName,
       lastName,
+      email,
       phoneNumber,
       password,
     });
